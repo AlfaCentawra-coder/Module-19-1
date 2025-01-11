@@ -5,7 +5,7 @@ from django.views.generic import TemplateView
 from django.http import HttpResponse
 from .forms import UserRegister
 from .models import *
-
+from django.core.paginator import Paginator
 
 class main1(TemplateView):
     template_name = 'platform.html'
@@ -53,6 +53,7 @@ def sign_up_by_html(request):
             message = info['error']
         return HttpResponse(message)
     return render(request, 'registration_page.html', info)
+
 def sign_up_by_django(request):
     users = []
     users1 = Buyer.objects.all().values()
@@ -91,3 +92,10 @@ def sign_up_by_django(request):
         form = UserRegister()
     info['form']=form
     return render(request, 'registration_page.html', info)
+
+def news(request):
+    news_list = News.objects.all().order_by('-date')
+    paginator = Paginator(news_list, 5) # 5 новостей на странице
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    return render(request, 'platform/news.html', {'page_obj': page_obj})
